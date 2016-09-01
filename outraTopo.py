@@ -74,7 +74,7 @@ def prepara(routers,prefixos):
             print outroRouter.cmd("route add -net %s gw %s"%(redeA,IPPublicoA))
 
 
-prefixos,tamanhos = [1,2,3,4,5],[10,20,30,40,4]
+prefixos,tamanhos = [1,2,3,4,5],[5,3,4,2,3]
 net = Mininet(PTT(prefixos,tamanhos))
 net.start()
 routers = filter(lambda x: x.name[0]=='r',net.hosts)
