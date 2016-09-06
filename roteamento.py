@@ -1,6 +1,6 @@
 visitados = None
 
-def prepara(net,grafo,topologia,defs):
+def criaRotas(net,grafo,topologia,defs):
     routersASs = filter(lambda x: x.name[:2]=='AS',net.hosts)
     routersReais = {}
     for nomeAS,defsAS in filter(lambda x: x[0][:2]=="AS",defs.items()):
