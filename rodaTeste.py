@@ -3,7 +3,6 @@ from mininet.util import dumpNodeConnections
 from roteamento import criaRotas
 from grafo import Grafo
 from dadosGrafo import grafo,defs
-from monitoramento import ativaMonitoramento
 import sys
 
 
