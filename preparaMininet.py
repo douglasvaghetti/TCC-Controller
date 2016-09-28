@@ -20,8 +20,8 @@ if __name__ == "__main__":
     diretorio = sys.argv[1]+"/dados"
     for host in net.hosts: #routers tambem sao hosts
         interfaces = [i.name for i in host.intfs.values()]
-        print "./monitora.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces))
-        host.cmd("./monitora.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces)))
+        print "./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces))
+        print host.cmd("./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces)))
 
     print "monitoramento ativado em todos os hosts"
 

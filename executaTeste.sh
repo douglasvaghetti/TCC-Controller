@@ -8,4 +8,4 @@ mkdir "$diretorio/dados"
 cp host.py "$diretorio/dados"
 cp dadosGrafo.py $diretorio
 chmod 777 -R $diretorio
-python rodaTeste.py $diretorio
+python preparaMininet.py $diretorio
