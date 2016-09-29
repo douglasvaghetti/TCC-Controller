@@ -5,7 +5,6 @@ chmod 777 $arquivo
 
 echo "host['$2'] = {}" >> $arquivo
 
-
 while true
 do
 
@@ -17,6 +16,5 @@ do
 	done
 
 	#echo "rodei $arquivo"
-
-	sleep 3
+	 sleep $[ ( $RANDOM % 7 )  + 3 ]s
 done

@@ -1,5 +1,7 @@
 from mininet.topo import Topo
 from linuxRouter import LinuxRouter
+from mininet.link import TCLink,TCIntf
+from mininet.node import CPULimitedHost
 
 
 
@@ -27,7 +29,7 @@ class Grafo(Topo):
         # print "hosts = ",self.hosts()
         # print "switches = ",self.switches()
 
-        
+
         # #cria os links com PTTs
         contadorRedes = 1
         for PTT,ASsAdjacentes in filter(lambda x: x[0][:3] == "PTT", grafo.items()):
@@ -35,7 +37,8 @@ class Grafo(Topo):
                 IPPublicoASNaRede = "172.16.%d.%d/24"%(contadorRedes,i+1)
 
                 print "adicionou link entre %s e %s"%(PTT,ASAdjacente)
-                self.addLink(nodosReais[PTT],nodosReais[ASAdjacente],params2={'ip':IPPublicoASNaRede,'pudim':'10.0.%s.1'%ASAdjacente})
+                link = self.addLink(nodosReais[PTT],nodosReais[ASAdjacente],params2={'ip':IPPublicoASNaRede})
+                print "link = ",link
                 for outroAS in ASsAdjacentes:
                     self.gateway[(ASAdjacente,outroAS)] = IPPublicoASNaRede[:-3] #o gateway dos outros ASs no PTT para este AS eh seu IP no PTT
 
@@ -52,8 +55,8 @@ class Grafo(Topo):
                 IPPublicoASNaRede1 = "172.16.%d.1/24"%(contadorRedes)
                 IPPublicoASNaRede2 = "172.16.%d.2/24"%(contadorRedes)
 
-                #print "adicionou link entre %s e %s usando a rede 172.16.%d.X"%(AS,ASAdjacente,contadorRedes)
-                self.addLink(nodosReais[AS],nodosReais[ASAdjacente],params1={'ip':IPPublicoASNaRede1},params2={'ip':IPPublicoASNaRede2})
+                print "adicionou link entre %s e %s usando a rede 172.16.%d.X"%(AS,ASAdjacente,contadorRedes)
+                self.addLink(nodosReais[AS],nodosReais[ASAdjacente],params1={'IP':IPPublicoASNaRede1},params2={'IP':IPPublicoASNaRede2})
                 self.gateway[(ASAdjacente,AS)] = IPPublicoASNaRede2[:-3] # o gateway para ASadjancente a partir do AS eh o ip dele na sua ligacao
                 self.gateway[(AS,ASAdjacente)] = IPPublicoASNaRede1[:-3] # e o contrario tambem
 
@@ -115,7 +118,8 @@ class Grafo(Topo):
             ipHost = "10.0.%d.%d/24"%(prefixo,i+2) #pula o zero e o router
             host = self.addHost(nome+"H%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
             #print "ligando host ",host,"com switch",switch," ip = ",ipHost
-            link = self.addLink(switch,host)
+            linkopts = dict(bw=10, delay='5ms', loss=10, max_queue_size=1000, use_htb=True)
+            link = self.addLink(switch,host,**linkopts) #1 mga de banda por host
         #print "terminou makeAS de %d"%prefixo
         return router
 
@@ -125,7 +129,7 @@ class Grafo(Topo):
         router = self.addHost(nome,cls=LinuxRouter,ip=ipRouter)
         switch = self.addSwitch(nome+"sw")
         self.addLink(switch,router)
-        
+
         return router
 
     def makeCP(self,prefixo,tamanho,nome):
@@ -140,7 +144,9 @@ class Grafo(Topo):
             ipHost = "10.0.%d.%d/24"%(prefixo,i+2) #pula o zero e o router
             host = self.addHost(nome+"H%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
             #print "ligando host ",host,"com switch",switch," ip = ",ipHost
+
             link = self.addLink(switch,host)
+
         #print "terminou makeAS de %d"%prefixo
         return router
 
@@ -149,5 +155,3 @@ class Grafo(Topo):
 
     def getRedesPublicasPorAS(self):
         return self.RedesPublicasPorAS
-
-

@@ -1,3 +1,6 @@
+from mininet.link import TCLink,TCIntf
+
+
 visitados = None
 
 def criaRotas(net,grafo,topologia,defs):
