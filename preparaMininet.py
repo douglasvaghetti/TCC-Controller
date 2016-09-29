@@ -22,7 +22,7 @@ if __name__ == "__main__":
         interfaces = [i.name for i in host.intfs.values()]
         print "./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces))
         print host.cmd("./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces)))
-
+	print host.cmd("python -m SimpleHTTPServer 80 &")
     print "monitoramento ativado em todos os hosts"
 
     print "Dumping host connections"
