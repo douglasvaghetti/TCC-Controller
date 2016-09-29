@@ -16,19 +16,23 @@ class Grafo(Topo):
         for nodo in grafoAciclico:
             #print "processando nodo ",nodo
             if nodo[:3] == "ISP":
-                nodosReais[nodo] = self.makeISP(defs[nodo][0],defs[nodo][1],nodo)
+                nodosReais[nodo] = self.makeISP(prefixo=defs[nodo][0],tamanho=defs[nodo][1],n_agressores=defs[nodo][2],nome=nodo)
             elif nodo[:2] == "CP":
-                nodosReais[nodo] = self.makeCP(defs[nodo][0],defs[nodo][1],nodo)
+                nodosReais[nodo] = self.makeCP(prefixo=defs[nodo][0],tamanho=defs[nodo][1],n_vitimas=defs[nodo][2],nome=nodo)
             elif nodo[:2] == "TP":
-                nodosReais[nodo] = self.makeTP(defs[nodo][0],nodo)
+                nodosReais[nodo] = self.makeTP(prefixo=defs[nodo][0],nome=nodo)
             elif nodo[:3] == "PTT":
-                nodosReais[nodo] = self.makePTT(defs[nodo][0],nodo)
+                nodosReais[nodo] = self.makePTT(prefixo=defs[nodo][0],nome=nodo)
             else:
                 raise "tem algo errado no grafo! :"+nodo
-        print "nodos reais = ",nodosReais
+        # print "nodos reais = ",nodosReais
         # print "hosts = ",self.hosts()
         # print "switches = ",self.switches()
 
+
+        self.ipsNaMao = {}
+        for AS in grafoAciclico:
+            self.ipsNaMao[AS] = {}
 
         # #cria os links com PTTs
         contadorRedes = 1
@@ -36,9 +40,14 @@ class Grafo(Topo):
             for i,ASAdjacente in enumerate(ASsAdjacentes):
                 IPPublicoASNaRede = "172.16.%d.%d/24"%(contadorRedes,i+1)
 
-                print "adicionou link entre %s e %s"%(PTT,ASAdjacente)
-                link = self.addLink(nodosReais[PTT],nodosReais[ASAdjacente],params2={'ip':IPPublicoASNaRede})
-                print "link = ",link
+                #print "adicionou link entre %s e %s"%(PTT,ASAdjacente)
+                self.addLink(nodosReais[PTT],nodosReais[ASAdjacente])
+
+                porta2 = self.linkInfo(PTT,ASAdjacente)['port2']
+                self.ipsNaMao[ASAdjacente][porta2] = IPPublicoASNaRede
+
+
+                #print "link = ",link
                 for outroAS in ASsAdjacentes:
                     self.gateway[(ASAdjacente,outroAS)] = IPPublicoASNaRede[:-3] #o gateway dos outros ASs no PTT para este AS eh seu IP no PTT
 
@@ -50,13 +59,24 @@ class Grafo(Topo):
 
             contadorRedes+=1
 
+
+
         for AS,ASsAdjacentes in filter(lambda x: x[0][:3] != "PTT", grafoAciclico.items()):
             for ASAdjacente in filter(lambda x: x[:3] != "PTT",ASsAdjacentes):
                 IPPublicoASNaRede1 = "172.16.%d.1/24"%(contadorRedes)
                 IPPublicoASNaRede2 = "172.16.%d.2/24"%(contadorRedes)
 
-                print "adicionou link entre %s e %s usando a rede 172.16.%d.X"%(AS,ASAdjacente,contadorRedes)
-                self.addLink(nodosReais[AS],nodosReais[ASAdjacente],params1={'IP':IPPublicoASNaRede1},params2={'IP':IPPublicoASNaRede2})
+                #print "adicionou link entre %s e %s usando a rede 172.16.%d.X"%(AS,ASAdjacente,contadorRedes)
+                self.addLink(nodosReais[AS],nodosReais[ASAdjacente])
+                #print "criou link = ",link
+                porta1,porta2 = self.linkInfo(AS,ASAdjacente)['port1'],self.linkInfo(AS,ASAdjacente)['port2']
+                self.ipsNaMao[AS][porta1] = IPPublicoASNaRede1
+                self.ipsNaMao[ASAdjacente][porta2] = IPPublicoASNaRede2
+
+
+
+
+
                 self.gateway[(ASAdjacente,AS)] = IPPublicoASNaRede2[:-3] # o gateway para ASadjancente a partir do AS eh o ip dele na sua ligacao
                 self.gateway[(AS,ASAdjacente)] = IPPublicoASNaRede1[:-3] # e o contrario tambem
 
@@ -106,7 +126,7 @@ class Grafo(Topo):
     #     #print "terminou makeAS de %d"%prefixo
     #     return router
 
-    def makeISP(self,prefixo,tamanho,nome):
+    def makeISP(self,prefixo,tamanho,n_agressores,nome):
         prefixo = prefixo
         ipRouter = "10.0.%d.1/24"%prefixo
 
@@ -116,10 +136,14 @@ class Grafo(Topo):
 
         for i in range(tamanho):
             ipHost = "10.0.%d.%d/24"%(prefixo,i+2) #pula o zero e o router
-            host = self.addHost(nome+"H%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
+            if i < n_agressores:
+                host = self.addHost(nome+"A%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
+            else:
+                host = self.addHost(nome+"H%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
             #print "ligando host ",host,"com switch",switch," ip = ",ipHost
-            linkopts = dict(bw=10, delay='5ms', loss=10, max_queue_size=1000, use_htb=True)
-            link = self.addLink(switch,host,**linkopts) #1 mga de banda por host
+            linkopts = dict(bw=1)
+            self.addLink(switch,host,**linkopts) #1 mga de banda por host
+
         #print "terminou makeAS de %d"%prefixo
         return router
 
@@ -132,7 +156,7 @@ class Grafo(Topo):
 
         return router
 
-    def makeCP(self,prefixo,tamanho,nome):
+    def makeCP(self,prefixo,tamanho,n_vitimas,nome):
         prefixo = prefixo
         ipRouter = "10.0.%d.1/24"%prefixo
 
@@ -142,7 +166,10 @@ class Grafo(Topo):
 
         for i in range(tamanho):
             ipHost = "10.0.%d.%d/24"%(prefixo,i+2) #pula o zero e o router
-            host = self.addHost(nome+"H%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
+            if i < n_vitimas:
+                host = self.addHost(nome+"V%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
+            else:
+                host = self.addHost(nome+"H%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
             #print "ligando host ",host,"com switch",switch," ip = ",ipHost
 
             link = self.addLink(switch,host)

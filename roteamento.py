@@ -39,15 +39,15 @@ def criaRotas(net,grafo,topologia,defs):
     for origem,vizinho in rotas:
         router = routersReais[origem]
         gatewayVizinho = gateway[(vizinho,origem)]
-        print "#### criando rotas de %s"%origem
+        #print "#### criando rotas de %s"%origem
         for destinoPossivel in rotas[(origem,vizinho)]:
             prefixoDestinoPossivel = defs[destinoPossivel][0]
-            print "rodando ","route add -net 10.0.%d.0/24 gw %s"%(prefixoDestinoPossivel,gatewayVizinho)
-            print router.cmd("route add -net 10.0.%d.0/24 gw %s"%(prefixoDestinoPossivel,gatewayVizinho))
+            #print "rodando ","route add -net 10.0.%d.0/24 gw %s"%(prefixoDestinoPossivel,gatewayVizinho)
+            router.cmd("route add -net 10.0.%d.0/24 gw %s"%(prefixoDestinoPossivel,gatewayVizinho))
             for redePublica in RedesPublicasPorAS[destinoPossivel]:
                 if destinoPossivel != vizinho:
                     #print "rodando chinelagem","route add -net %s gw %s"%(redePublica,gatewayVizinho)
-                    print router.cmd("route add -net %s gw %s"%(redePublica,gatewayVizinho))
+                    router.cmd("route add -net %s gw %s"%(redePublica,gatewayVizinho))
             #adiciona uma rota para cada rede publica que o AS alvo se conecta (isso acaba criando rotas inuteis mas funciona)
             #tambem adiciona varias rotas iguais, ja que faz isso uma vez para cada host dentro de uma mesma rede
             #nao importa, funciona
