@@ -33,4 +33,4 @@ while True:
 	n1,n2 = [x.split()[-1] for x in [linha1,linha2]]
 	ipsIgnorados = set("255.255.255.255")
 	if ipOrig not in ipsIgnorados and ipDest not in ipsIgnorados:
-		print 'host["%s"] = ["%s","%s",%.2f,%.2f,%d]'%(nomeDoHost,ipOrig,ipDest,converte(n1),converte(n2),int(time.time()))
+		print 'host["%s"].append( ("%s","%s",%.2f,%.2f,%d) )'%(nomeDoHost,ipOrig,ipDest,converte(n1),converte(n2),int(time.time()))

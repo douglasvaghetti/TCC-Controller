@@ -3,7 +3,7 @@ arquivo="$1/$2.py"
 touch $arquivo
 chmod 777 $arquivo
 
-echo "host['$2'] = {}" >> $arquivo
+echo "host['$2'] = []" >> $arquivo
 
 while true
 do
