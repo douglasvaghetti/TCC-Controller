@@ -59,13 +59,13 @@ grafo["CP3"] = ["TP3"]
 grafo["CP4"] = ["TP3"]
 
 defs = {}
-defs["PTT1"] = (1,False) #numero do PTT, implementa bloqueio
+defs["PTT1"] = (1,True) #numero do PTT, implementa bloqueio
 defs["PTT2"] = (2,False)
 
 
 defs["ISP1"] = (1,3,2) #prefixo, numero de hosts, numero de agressores
 defs["ISP2"] = (2,4,0)
-defs["ISP3"] = (3,20,10)
+defs["ISP3"] = (3,2,1)
 defs["ISP4"] = (4,4,0)
 defs["ISP5"] = (5,4,0)
 defs["ISP6"] = (6,4,0)

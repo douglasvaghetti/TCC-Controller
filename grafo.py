@@ -11,7 +11,7 @@ class Grafo(Topo):
         nodosReais = {}
         self.gateway = {}
         self.RedesPublicasPorAS = {}
-
+        self.SWsQueImplementamBloqueio = set()
         #cria os nodos no mininet
         for nodo in grafoAciclico:
             #print "processando nodo ",nodo
@@ -22,7 +22,7 @@ class Grafo(Topo):
             elif nodo[:2] == "TP":
                 nodosReais[nodo] = self.makeTP(prefixo=defs[nodo][0],nome=nodo)
             elif nodo[:3] == "PTT":
-                nodosReais[nodo] = self.makePTT(prefixo=defs[nodo][0],nome=nodo)
+                 nodosReais[nodo] = self.makePTT(prefixo=defs[nodo][0],implementaBloqueio=defs[nodo][1],nome=nodo)
             else:
                 raise "tem algo errado no grafo! :"+nodo
         # print "nodos reais = ",nodosReais
@@ -107,24 +107,10 @@ class Grafo(Topo):
                     semAmbiguidade[origem].append(destino)
         return semAmbiguidade
 
-    def makePTT(self,prefixo,nome,rodaMatadorDePassarinho=False):
+    def makePTT(self,prefixo,implementaBloqueio,nome):
+        if implementaBloqueio:
+            self.SWsQueImplementamBloqueio.add(nome)
         return self.addSwitch(nome)
-
-    # def makeAS(self,prefixo,tamanho):
-    #     prefixo = prefixo
-    #     ipRouter = "10.0.%d.1/24"%prefixo
-
-    #     router = self.addHost("AS%d"%prefixo,cls=LinuxRouter,ip=ipRouter)
-    #     switch = self.addSwitch("AS%dsw"%prefixo)
-    #     self.addLink(switch,router)
-
-    #     for i in range(tamanho):
-    #         ipHost = "10.0.%d.%d/24"%(prefixo,i+2) #pula o zero e o router
-    #         host = self.addHost("AS%dH%d"%(prefixo,i),ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
-    #         #print "ligando host ",host,"com switch",switch," ip = ",ipHost
-    #         link = self.addLink(switch,host)
-    #     #print "terminou makeAS de %d"%prefixo
-    #     return router
 
     def makeISP(self,prefixo,tamanho,n_agressores,nome):
         prefixo = prefixo
@@ -135,13 +121,15 @@ class Grafo(Topo):
         self.addLink(switch,router)
 
         for i in range(tamanho):
-            ipHost = "10.0.%d.%d/24"%(prefixo,i+2) #pula o zero e o router
+
             if i < n_agressores:
+                ipHost = "10.0.%d.%d/24"%(prefixo,i+100) #pula o zero e o router
                 host = self.addHost(nome+"A%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
             else:
+                ipHost = "10.0.%d.%d/24"%(prefixo,i+2) #pula o zero e o router
                 host = self.addHost(nome+"H%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
             #print "ligando host ",host,"com switch",switch," ip = ",ipHost
-            linkopts = dict(bw=1)
+            linkopts = dict(bw=5)
             self.addLink(switch,host,**linkopts) #1 mga de banda por host
 
         #print "terminou makeAS de %d"%prefixo

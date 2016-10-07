@@ -90,3 +90,5 @@ ENV/
 
 testes/
 lixo/
+.DS_*
+._.DS_*

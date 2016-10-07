@@ -33,7 +33,9 @@ class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
 
 
 def startServer():
-	HOST, PORT = "192.168.0.120", 50001
+	global webServerPorta
+	print "porta = ",int(webServerPorta)
+	HOST, PORT = "127.0.0.1",int(webServerPorta) 
 
 	server = ThreadedTCPServer((HOST, PORT), ThreadedTCPRequestHandler)
 	ip, port = server.server_address
@@ -63,7 +65,7 @@ class Tutorial (object):
 		# Use this table to keep track of which ethernet address is on
 		# which switch port (keys are MACs, values are ports).
 		log.debug("instanciou o controller")
-		startServer()
+		#startServer()
 		log.debug("iniciou o server")
 		self.mac_to_port = {}
 
@@ -172,16 +174,18 @@ class Tutorial (object):
 		self.processa(packet, packet_in)
 
 
-		
-
-
-
-def launch ():
+global webServerPorta
+def launch (webServerPort=8000):
 	"""
 	Starts the component
 	"""
+	global webServerPorta
+	webServerPorta = webServerPort
 	def start_switch (event):
+		teste = event.connection
+		#print dir(teste),teste,type(teste)
 		log.debug("Controlling %s" % (event.connection,))
 		global controller
+		print "matador de passarinho rodando!"
 		controller = Tutorial(event.connection)
 	core.openflow.addListenerByName("ConnectionUp", start_switch)
