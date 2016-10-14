@@ -40,6 +40,11 @@ if __name__ == "__main__":
 
     #print dir(teste),teste,type(teste)
     print "terminou instanciacao de controladores"
+    controladores = []
+    for i,porta in enumerate(range(6632,6655)):
+	controladores.append(net.addController('c%d'%i,port=porta))
+    print controladores	
+    #c1 = net.addController( 'c1', port=6633 )
 
     print "vai dar net.build"
     net.build()
@@ -51,14 +56,17 @@ if __name__ == "__main__":
     #     #controller.start()
     # print "iniciou os controladores"
 
-    # print "inciando os switches"
-    # for switch in net.switches:
-    #     if switch.name in controladoresPorSW:
-    #         switch.start([controladoresPorSW[switch.name]])
-    #     else:
-    #         print "switch ",switch.name,"liberado"
-    #         switch.start([])
-    # print "terminou de iniciar os switches"
+    #c1.start()
+    print "inciando os switches"
+    i = 0
+    for switch in net.switches:
+        if switch.name in controladoresPorSW:
+            switch.start([controladoresPorSW[switch.name]])
+        else:
+            print "switch ",switch.name,"liberado"
+            switch.start([controladores[i]])
+            i = i + 1
+    print "terminou de iniciar os switches"
     #time.sleep(5)
 
 
@@ -74,8 +82,8 @@ if __name__ == "__main__":
     criaRotas(net,grafo,topologia,defs)
     print "terminou de criar rotas"
 
-    print "vai startar"
-    net.start()
+    #print "vai startar"
+    #net.start()
 
     #time.sleep(5)
 
@@ -101,5 +109,6 @@ if __name__ == "__main__":
     dumpNodeConnections(net.hosts)
     print "tudo ok"
     #net.pingAll(timeout=0.2)
+    
     net.interact()
     net.stop()
