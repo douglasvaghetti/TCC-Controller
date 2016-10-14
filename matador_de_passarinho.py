@@ -34,8 +34,10 @@ class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
 
 def startServer():
 	global webServerPorta
-	print "porta = ",int(webServerPorta)
-	HOST, PORT = "127.0.0.1",int(webServerPorta) 
+    webServerPorta = int(webServerPorta)
+	print "porta = ",webServerPorta
+	HOST, PORT = "127.0.0.1",webServerPorta
+    webServerPorta += 1
 
 	server = ThreadedTCPServer((HOST, PORT), ThreadedTCPRequestHandler)
 	ip, port = server.server_address
@@ -109,7 +111,7 @@ class Tutorial (object):
 	def cria_regra_drop(self,ipOrig,ipDest):
 		msg = of.ofp_flow_mod()
 		msg.priority = 200
-		
+
 		#msg.match = of.ofp_match.from_packet(packet)
 		msg.match = of.ofp_match(dl_type = pkt.ethernet.IP_TYPE, nw_dst=ipDest,nw_src=ipOrig)
 		#sem acao nenhuma = DROP
@@ -136,11 +138,11 @@ class Tutorial (object):
 
 	def processa(self, packet, packet_in):
 		#print "packet tem",dir(packet)
-		
+
 		if packet.type == packet.IP_TYPE:
 			ipOrig = packet.find('ipv4').srcip
 			ipDest = packet.find('ipv4').dstip
-			
+
 			print "pacote de",ipOrig,"para",ipDest
 			print listaBloqueios
 			if str(ipDest) in listaBloqueios:

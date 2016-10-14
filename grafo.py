@@ -1,12 +1,14 @@
-from mininet.topo import Topo
 from linuxRouter import LinuxRouter
-from mininet.link import TCLink,TCIntf
-from mininet.node import CPULimitedHost
+from mininet.link import TCLink#,TCIntf
+from mininet.node import OVSSwitch,Controller
+from mininet.net import Mininet
 
 
 
-class Grafo(Topo):
-    def build(self,grafo,defs):
+
+class Grafo():
+    def __init__(self,grafo,defs):
+        self.net = Mininet(switch=OVSSwitch, controller=Controller)
         grafoAciclico = self.tiraAmbiguidades(grafo)
         nodosReais = {}
         self.gateway = {}
@@ -25,14 +27,9 @@ class Grafo(Topo):
                  nodosReais[nodo] = self.makePTT(prefixo=defs[nodo][0],implementaBloqueio=defs[nodo][1],nome=nodo)
             else:
                 raise "tem algo errado no grafo! :"+nodo
-        # print "nodos reais = ",nodosReais
-        # print "hosts = ",self.hosts()
-        # print "switches = ",self.switches()
-
-
-        self.ipsNaMao = {}
-        for AS in grafoAciclico:
-            self.ipsNaMao[AS] = {}
+        print "nodos reais = ",nodosReais
+        print "hosts = ",self.net.hosts
+        print "switches = ",self.net.switches
 
         # #cria os links com PTTs
         contadorRedes = 1
@@ -41,11 +38,8 @@ class Grafo(Topo):
                 IPPublicoASNaRede = "172.16.%d.%d/24"%(contadorRedes,i+1)
 
                 #print "adicionou link entre %s e %s"%(PTT,ASAdjacente)
-                self.addLink(nodosReais[PTT],nodosReais[ASAdjacente])
-
-                porta2 = self.linkInfo(PTT,ASAdjacente)['port2']
-                self.ipsNaMao[ASAdjacente][porta2] = IPPublicoASNaRede
-
+                link = self.net.addLink(nodosReais[PTT],nodosReais[ASAdjacente])
+                #link.intf2.setIP(IPPublicoASNaRede)
 
                 #print "link = ",link
                 for outroAS in ASsAdjacentes:
@@ -59,23 +53,15 @@ class Grafo(Topo):
 
             contadorRedes+=1
 
-
-
         for AS,ASsAdjacentes in filter(lambda x: x[0][:3] != "PTT", grafoAciclico.items()):
             for ASAdjacente in filter(lambda x: x[:3] != "PTT",ASsAdjacentes):
                 IPPublicoASNaRede1 = "172.16.%d.1/24"%(contadorRedes)
                 IPPublicoASNaRede2 = "172.16.%d.2/24"%(contadorRedes)
 
                 #print "adicionou link entre %s e %s usando a rede 172.16.%d.X"%(AS,ASAdjacente,contadorRedes)
-                self.addLink(nodosReais[AS],nodosReais[ASAdjacente])
-                #print "criou link = ",link
-                porta1,porta2 = self.linkInfo(AS,ASAdjacente)['port1'],self.linkInfo(AS,ASAdjacente)['port2']
-                self.ipsNaMao[AS][porta1] = IPPublicoASNaRede1
-                self.ipsNaMao[ASAdjacente][porta2] = IPPublicoASNaRede2
-
-
-
-
+                link = self.net.addLink(nodosReais[AS],nodosReais[ASAdjacente])
+                #link.intf1.setIP(IPPublicoASNaRede1)
+                #link.intf2.setIP(IPPublicoASNaRede2)
 
                 self.gateway[(ASAdjacente,AS)] = IPPublicoASNaRede2[:-3] # o gateway para ASadjancente a partir do AS eh o ip dele na sua ligacao
                 self.gateway[(AS,ASAdjacente)] = IPPublicoASNaRede1[:-3] # e o contrario tambem
@@ -92,7 +78,7 @@ class Grafo(Topo):
                     self.RedesPublicasPorAS[ASAdjacente].append(redePublica)
 
                 contadorRedes+=1
-        #print "fim do build"
+
 
     def tiraAmbiguidades(self,grafo):
         semAmbiguidade = {}
@@ -110,27 +96,27 @@ class Grafo(Topo):
     def makePTT(self,prefixo,implementaBloqueio,nome):
         if implementaBloqueio:
             self.SWsQueImplementamBloqueio.add(nome)
-        return self.addSwitch(nome)
+        return self.net.addSwitch(nome)
 
     def makeISP(self,prefixo,tamanho,n_agressores,nome):
         prefixo = prefixo
         ipRouter = "10.0.%d.1/24"%prefixo
 
-        router = self.addHost(nome,cls=LinuxRouter,ip=ipRouter)
-        switch = self.addSwitch(nome+"sw")
-        self.addLink(switch,router)
+        router = self.net.addHost(nome,cls=LinuxRouter,ip=ipRouter)
+        switch = self.net.addSwitch(nome+"sw")
+        self.net.addLink(switch,router)
 
         for i in range(tamanho):
 
             if i < n_agressores:
                 ipHost = "10.0.%d.%d/24"%(prefixo,i+100) #pula o zero e o router
-                host = self.addHost(nome+"A%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
+                host = self.net.addHost(nome+"A%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
             else:
                 ipHost = "10.0.%d.%d/24"%(prefixo,i+2) #pula o zero e o router
-                host = self.addHost(nome+"H%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
+                host = self.net.addHost(nome+"H%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
             #print "ligando host ",host,"com switch",switch," ip = ",ipHost
             linkopts = dict(bw=5)
-            self.addLink(switch,host,**linkopts) #1 mga de banda por host
+            self.net.addLink(switch,host)#,**linkopts) #1 mga de banda por host
 
         #print "terminou makeAS de %d"%prefixo
         return router
@@ -138,9 +124,9 @@ class Grafo(Topo):
     def makeTP(self,prefixo,nome):
         prefixo = prefixo
         ipRouter = "10.0.%d.1/24"%prefixo
-        router = self.addHost(nome,cls=LinuxRouter,ip=ipRouter)
-        switch = self.addSwitch(nome+"sw")
-        self.addLink(switch,router)
+        router = self.net.addHost(nome,cls=LinuxRouter,ip=ipRouter)
+        switch = self.net.addSwitch(nome+"sw")
+        self.net.addLink(switch,router)
 
         return router
 
@@ -148,19 +134,19 @@ class Grafo(Topo):
         prefixo = prefixo
         ipRouter = "10.0.%d.1/24"%prefixo
 
-        router = self.addHost(nome,cls=LinuxRouter,ip=ipRouter)
-        switch = self.addSwitch(nome+"sw")
-        self.addLink(switch,router)
+        router = self.net.addHost(nome,cls=LinuxRouter,ip=ipRouter)
+        switch = self.net.addSwitch(nome+"sw")
+        self.net.addLink(switch,router)
 
         for i in range(tamanho):
             ipHost = "10.0.%d.%d/24"%(prefixo,i+2) #pula o zero e o router
             if i < n_vitimas:
-                host = self.addHost(nome+"V%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
+                host = self.net.addHost(nome+"V%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
             else:
-                host = self.addHost(nome+"H%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
+                host = self.net.addHost(nome+"H%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
             #print "ligando host ",host,"com switch",switch," ip = ",ipHost
 
-            link = self.addLink(switch,host)
+            link = self.net.addLink(switch,host)
 
         #print "terminou makeAS de %d"%prefixo
         return router
