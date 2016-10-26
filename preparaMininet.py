@@ -1,6 +1,6 @@
 from mininet.net import Mininet
 from mininet.util import dumpNodeConnections
-#from mininet.node import Controller, RemoteController
+from mininet.node import Controller, RemoteController
 from roteamento import criaRotas
 from grafo import Grafo
 from dadosGrafo import grafo,defs
@@ -9,6 +9,8 @@ from mininet.link import TCLink
 import random
 import os
 import time
+from mininet.cli import CLI
+
 
 
 
@@ -22,60 +24,37 @@ if __name__ == "__main__":
     print "instanciando controladores para os PTTs"
     n = 0
     controladoresPorSW = {}
-    #portas = range(6633,6633+len(topologia.SWsQueImplementamBloqueio))
-    #SWs = list(topologia.SWsQueImplementamBloqueio)
-    # os.system("/home/mininet/pox/pox.py log.level --DEBUG openflow.of_01 --port=%d --address=10.0.0.5 misc.matador_de_passarinho --webServerPort=%d &"%(56670,57670))
-    # time.sleep(2)
-    # controladorLiberado = net.addController('c%d'%n,controller=RemoteController,port=56670,ip='10.0.0.5')
-    # print controladorLiberado
-
-    #
-    # for switch,porta in zip(SWs,portas):
-    #     print "vai rodar /home/mininet/pox/pox.py log.level --DEBUG openflow.of_01 --port=%d misc.matador_de_passarinho --webServerPort=%d &"%(porta,porta+1000)
-    #     os.system("/home/mininet/pox/pox.py log.level --DEBUG openflow.of_01 --port=%d --address=127.0.0.1 misc.matador_de_passarinho --webServerPort=%d &"%(porta,porta+1000))
-    #     controlador = net.addController('c%d'%n,controller=RemoteController,port=porta,protocol='tcp',ip='127.0.0.1')
-    #
-    #     controladoresPorSW[switch] = controlador
-
-
-    #print dir(teste),teste,type(teste)
-    print "terminou instanciacao de controladores"
-    controladores = []
-    for i,porta in enumerate(range(6632,6655)):
-	controladores.append(net.addController('c%d'%i,port=porta))
-    print controladores	
-    #c1 = net.addController( 'c1', port=6633 )
-
+    os.system("/home/mininet/pox/pox.py openflow.of_01 --port=%d --address=10.0.0.5  forwarding.l2_learning  &"%(6634))
+    os.system("/home/mininet/pox/pox.py log.level --DEBUG openflow.of_01 --port=%d --address=10.0.0.5 misc.matador_de_passarinho --webServerPort=%d &"%(6635,6670))
+#    time.sleep(5)
+    c1 = net.addController('c1', port=6634, controller=RemoteController, ip = "10.0.0.5")
+    c2 = net.addController( 'c2', port=6635, controller=RemoteController, ip = "10.0.0.5" )
     print "vai dar net.build"
     net.build()
     print "fim do net.build"
+    c1.start()
+    c2.start()
+    #time.sleep(5)
 
-    # print "inciando os controladores"
-    # for controller in net.controllers:
-    #     print ".",
-    #     #controller.start()
-    # print "iniciou os controladores"
+    teste = net.switches[0]
+    print teste,dir(teste),type(teste)
 
-    #c1.start()
     print "inciando os switches"
-    i = 0
     for switch in net.switches:
-        if switch.name in controladoresPorSW:
-            switch.start([controladoresPorSW[switch.name]])
+        if switch.name[:3] == "PTT" :
+            switch.start([c2])
+	    print ">>>>>instanciando switch com matador de passarinho"
         else:
-            print "switch ",switch.name,"liberado"
-            switch.start([controladores[i]])
-            i = i + 1
+	    print ">>>>instanciando switch sem matador de passarinho"
+            switch.start([c1])
+        #time.sleep(1)
     print "terminou de iniciar os switches"
     #time.sleep(5)
 
-
-
-    # ipsNaMao = topologia.ipsNaMao
-    # print "botando ips na mao"
-    # for AS,IPsPorIntf in ipsNaMao.items():
-    #     for intf,IP in IPsPorIntf.items():
-    #         net.get(AS).intfs[intf].setIP(IP)
+    # print "vai startar os hosts"
+    # for host in net.hosts:
+    #     host.start()
+    # print "startou os hosts"
 
 
     print "criando rotas"
@@ -107,8 +86,10 @@ if __name__ == "__main__":
 
     print "Dumping host connections"
     dumpNodeConnections(net.hosts)
+    net.pingAll(timeout=0.1)
     print "tudo ok"
     #net.pingAll(timeout=0.2)
-    
-    net.interact()
+    CLI(net)
+    net.pingAll(timeout=0.1)
+    print "fim"
     net.stop()

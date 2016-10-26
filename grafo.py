@@ -8,7 +8,7 @@ from mininet.net import Mininet
 
 class Grafo():
     def __init__(self,grafo,defs):
-        self.net = Mininet(switch=OVSSwitch, controller=Controller)
+        self.net = Mininet(build=False, topo=None,link = TCLink)
         grafoAciclico = self.tiraAmbiguidades(grafo)
         nodosReais = {}
         self.gateway = {}
@@ -39,7 +39,7 @@ class Grafo():
 
                 #print "adicionou link entre %s e %s"%(PTT,ASAdjacente)
                 link = self.net.addLink(nodosReais[PTT],nodosReais[ASAdjacente])
-                #link.intf2.setIP(IPPublicoASNaRede)
+                link.intf2.setIP(IPPublicoASNaRede)
 
                 #print "link = ",link
                 for outroAS in ASsAdjacentes:
@@ -60,8 +60,8 @@ class Grafo():
 
                 #print "adicionou link entre %s e %s usando a rede 172.16.%d.X"%(AS,ASAdjacente,contadorRedes)
                 link = self.net.addLink(nodosReais[AS],nodosReais[ASAdjacente])
-                #link.intf1.setIP(IPPublicoASNaRede1)
-                #link.intf2.setIP(IPPublicoASNaRede2)
+                link.intf1.setIP(IPPublicoASNaRede1)
+                link.intf2.setIP(IPPublicoASNaRede2)
 
                 self.gateway[(ASAdjacente,AS)] = IPPublicoASNaRede2[:-3] # o gateway para ASadjancente a partir do AS eh o ip dele na sua ligacao
                 self.gateway[(AS,ASAdjacente)] = IPPublicoASNaRede1[:-3] # e o contrario tambem
@@ -102,7 +102,7 @@ class Grafo():
         prefixo = prefixo
         ipRouter = "10.0.%d.1/24"%prefixo
 
-        router = self.net.addHost(nome,cls=LinuxRouter,ip=ipRouter)
+        router = self.net.addHost(nome,cls=LinuxRouter,ip = ipRouter)
         switch = self.net.addSwitch(nome+"sw")
         self.net.addLink(switch,router)
 
