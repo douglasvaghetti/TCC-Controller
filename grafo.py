@@ -27,9 +27,9 @@ class Grafo():
                  nodosReais[nodo] = self.makePTT(prefixo=defs[nodo][0],implementaBloqueio=defs[nodo][1],nome=nodo)
             else:
                 raise "tem algo errado no grafo! :"+nodo
-        print "nodos reais = ",nodosReais
-        print "hosts = ",self.net.hosts
-        print "switches = ",self.net.switches
+        #print "nodos reais = ",nodosReais
+        #print "hosts = ",self.net.hosts
+        #print "switches = ",self.net.switches
 
         # #cria os links com PTTs
         contadorRedes = 1

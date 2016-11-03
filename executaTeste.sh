@@ -3,9 +3,11 @@ mn -c
 pkill webfsd
 pkill wget
 ps -ax | grep pox | egrep -v 'color=auto' | awk {'print $1'} | xargs -L1 -I% kill -9 %
+ps -ax | grep sflowrt.jar | egrep -v 'color=auto' | awk {'print $1'} | xargs -L1 -I% kill -9 %
 data="$(date | awk '{print $3 "-"$2"-"$4}' | sed 's/:/-/g')"
 diretorio="testes/$data"
 clear
+./sflow-rt/start.sh &
 mkdir $diretorio
 mkdir "$diretorio/dados"
 cp host.py "$diretorio/dados"

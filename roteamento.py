@@ -39,7 +39,7 @@ def criaRotas(net,grafo,topologia,defs):
     for origem,vizinho in rotas:
         router = routersReais[origem]
         gatewayVizinho = gateway[(vizinho,origem)]
-        print "#### criando rotas de %s"%origem
+        #print "#### criando rotas de %s"%origem
         for destinoPossivel in rotas[(origem,vizinho)]:
             prefixoDestinoPossivel = defs[destinoPossivel][0]
             #print "rodando ","route add -net 10.0.%d.0/24 gw %s"%(prefixoDestinoPossivel,gatewayVizinho)

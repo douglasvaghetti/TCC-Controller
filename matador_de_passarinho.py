@@ -95,7 +95,7 @@ class Tutorial (object):
 
 		if packet.dst in self.mac_to_port:
 
-			print("Installing flow...")
+			#print("Installing flow...")
 
 			msg = of.ofp_flow_mod()
 			msg.priority = 100
