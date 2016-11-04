@@ -64,16 +64,16 @@ for listaLeituras in host.values():
 # 		plt.plot(tempo,down)
 # 		plt.plot(tempo,up)
 
-tempo = somatorioLegitimo.keys()
-trafegoLegitimo = somatorioLegitimo.values()
+pares = sorted(somatorioLegitimo.items())
+tempo = [i[0] for i in pares]
+trafegoLegitimo = [i[1] for i in pares]
 plt.plot(tempo,trafegoLegitimo,color="blue")
-tempo = somatorioMalicioso.keys()
-trafegoMalicioso = somatorioMalicioso.values()
+
+
+paresMalicioso = sorted(somatorioMalicioso.items())
+tempoMalicioso = [i[0] for i in pares]
+trafegoMalicioso = [i[1] for i in pares]
 plt.plot(tempo,trafegoMalicioso,color="red")
-
-print trafegoMalicioso
-
-print trafegoLegitimo
 
 
 

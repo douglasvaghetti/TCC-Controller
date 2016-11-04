@@ -51,9 +51,9 @@ grafo["CP2"] = ["TP1"]
 defs = {}
 defs["PTT1"] = (1,True)
 defs["PTT2"] = (2,True)
-defs["ISP1"] = (1,2,1)
+defs["ISP1"] = (1,10,5)
 defs["CP1"] = (101,2,1)
-defs["CP2"] = (102,2,1)
+defs["CP2"] = (102,2,0)
 defs["TP1"] = (201,)
 
 # grafo = {}

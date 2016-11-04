@@ -51,26 +51,17 @@ if __name__ == "__main__":
         #time.sleep(1)
     print "terminou de iniciar os switches"
 
-
-    print "inicializando sflow"
-    #sflow.inicializaSflow()
-    print "inicializou sflow"
-    #time.sleep(5)
-
-    # print "vai startar os hosts"
-    # for host in net.hosts:
-    #     host.start()
-    # print "startou os hosts"
-
-
-
     print "criando rotas"
     criaRotas(net,grafo,topologia,defs)
     print "terminou de criar rotas"
 
-    #print "vai startar"
-    #net.start()
+    print "inicializando sflow"
+    collector = '127.0.0.1'
+    (ifname, agent) = sflow.getIfInfo(collector)
+    sflow.configSFlow(net,collector,ifname)
+    sflow.sendTopology(net,agent,collector) 
 
+    print "inicializou sflow"
     #time.sleep(5)
 
     print "ativando monitoramento"
@@ -87,14 +78,17 @@ if __name__ == "__main__":
             elif "A" in host.name: # se eh host agressor, ex: ISPXAY
                 host.cmd("ping -i 0.0005 -s 1000 %s > /dev/null &"%(random.choice(ipsHostsVitimas)))
             elif len(host.name)==4:
-                host.cmd("./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces)))
+                pass
+                #host.cmd("./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces)))
         elif host.name[:2] == "CP":
             if len(host.name)==5:
                 host.cmd("./webfsd -p80")
             elif len(host.name)==3:
-                host.cmd("./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces)))
+                pass
+                #host.cmd("./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces)))
         elif host.name[:2] == "TP":
-            host.cmd("./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces)))
+            pass
+            #host.cmd("./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces)))
 
     print "monitoramento ativado em todos os hosts"
     
@@ -105,6 +99,6 @@ if __name__ == "__main__":
     print "tudo ok"
     #net.pingAll(timeout=0.2)
     CLI(net)
-    net.pingAll(timeout=0.1)
+    #net.pingAll(timeout=0.1)
     print "fim"
     net.stop()

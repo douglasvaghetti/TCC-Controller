@@ -115,8 +115,8 @@ class Grafo():
                 ipHost = "10.0.%d.%d/24"%(prefixo,i+2) #pula o zero e o router
                 host = self.net.addHost(nome+"H%d"%i,ip=ipHost,defaultRoute="via 10.0.%d.1"%prefixo)
             #print "ligando host ",host,"com switch",switch," ip = ",ipHost
-            linkopts = dict(bw=5)
-            self.net.addLink(switch,host)#,**linkopts) #1 mga de banda por host
+            linkopts = dict(bw=10)
+            self.net.addLink(switch,host,**linkopts) #1 mga de banda por host
 
         #print "terminou makeAS de %d"%prefixo
         return router
