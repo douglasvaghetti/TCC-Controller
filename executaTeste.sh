@@ -14,8 +14,15 @@ mkdir "$diretorio/dados"
 cp host.py "$diretorio/dados"
 cp dadosGrafo.py $diretorio
 chmod 777 -R $diretorio
-python extraiDadosSflow.py "$diretorio/dados/acumulado.py" &
+
+cd "$diretorio/dados/"
+python ../../../extraiDadosSflow.py &
+cd "../../../"
 python preparaMininet.py $diretorio
+echo "encerrou o prepara mininet"
+cd "$diretorio/dados/"
 mn -c
 pgrep python | xargs -L1 -I% kill -9 %
-python "$diretorio/dados/host.py" "$diretorio/dados/acumulado.py"
+echo "rodou o matador de python"
+python host.py 
+echo "plotou o grafico"

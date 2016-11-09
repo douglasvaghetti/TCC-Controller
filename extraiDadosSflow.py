@@ -1,32 +1,47 @@
 import requests
 from time import sleep
 import sys, os
+import subprocess
+from os import listdir
 
-if len(sys.argv) != 2 :
-	print 'Numero de parametros incorreto'
-	os._exit()
+execfile("../dadosGrafo.py")
 
-nomeArquivo = sys.argv[1]
+listaPTTs = [x for x in grafo.keys() if x[:3] == "PTT"]
 
-f = open(nomeArquivo,'w')
+f = open("acumulado.py", 'w')
 f.write('dados = {}\n')
 f.write('dados["malicioso"] = []\n')
 f.write('dados["legitimo"] = []\n')
+f.write('dados["regras"] = []\n')
 f.close()
 sleep(5)
 
-while True :
-	r = requests.get("http://127.0.0.1:8008/app/dashboard-example/scripts/metrics.js/metric/json")
-	try:	
-		icmp = r.json()['top-5-protocols']['eth.ip.icmp']
-	except:
-		icmp = 0
-	try:
-		tcp = r.json()['top-5-protocols']['eth.ip.tcp']
-	except:
-		tcp = 0
-	f = open(nomeArquivo,'a')
-	f.write('dados["malicioso"].append('+str(icmp)+')\n')
-	f.write('dados["legitimo"].append('+str(tcp)+')\n')
-	f.close()
-	sleep(1)
+while True:
+    r = requests.get(
+        "http://127.0.0.1:8008/app/dashboard-example/scripts/metrics.js/metric/json"
+    )
+    try:
+        icmp = r.json()['top-5-protocols']['eth.ip.icmp'] / 1024**2
+    except:
+        icmp = 0
+    try:
+        tcp = r.json()['top-5-protocols']['eth.ip.tcp'] / 1024**2
+    except:
+        tcp = 0
+
+    NRegras = 0
+    for ptt in listaPTTs:
+        proc = subprocess.Popen(
+            ["ovs-ofctl dump-flows %s | wc -l" % ptt],
+            stdout=subprocess.PIPE,
+            shell=True)
+        (out, err) = proc.communicate()
+        NRegras += int(out)
+        #NRegras += os.system("ovs-ofctl dump-flows %s | wc -l"%ptt)
+
+    f = open("acumulado.py", 'a')
+    f.write('dados["malicioso"].append(' + str(icmp) + ')\n')
+    f.write('dados["legitimo"].append(' + str(tcp) + ')\n')
+    f.write('dados["regras"].append(' + str(NRegras) + ")\n")
+    f.close()
+    sleep(1)
