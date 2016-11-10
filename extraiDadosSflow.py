@@ -36,11 +36,13 @@ while True:
             stdout=subprocess.PIPE,
             shell=True)
         (out, err) = proc.communicate()
+        #print "erro:",err
         NRegras += int(out)
 
     f = open("acumulado.py", 'a')
     f.write('dados["malicioso"].append(' + str(icmp) + ')\n')
     f.write('dados["legitimo"].append(' + str(tcp) + ')\n')
     f.write('dados["regras"].append(' + str(NRegras) + ")\n")
+    #print "icmp = ",icmp,"tcp=",tcp,"NRegras=",NRegras
     f.close()
     sleep(1)

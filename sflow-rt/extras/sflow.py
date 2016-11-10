@@ -46,7 +46,6 @@ def sendTopology(net,agent,collector):
     for s2 in net.switches:
       if j > i:
         intfs = s1.connectionsTo(s2)
-        print "intfs = ",intfs
         for intf in intfs:
           s1ifIdx = topo['nodes'][s1.name]['ports'][intf[0].name]['ifindex']
           s2ifIdx = topo['nodes'][s2.name]['ports'][intf[1].name]['ifindex']
@@ -54,8 +53,7 @@ def sendTopology(net,agent,collector):
           topo['links'][linkName] = {'node1': s1.name, 'port1': intf[0].name, 'node2': s2.name, 'port2': intf[1].name}
       j += 1
     i += 1
-  
-  print "gerou",dumps(topo)
+
   put('http://'+collector+':8008/topology/json',data=dumps(topo))
 
 def wrapper(fn,collector):
