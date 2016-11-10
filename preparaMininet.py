@@ -41,12 +41,12 @@ if __name__ == "__main__":
 
     print "inciando os switches"
     for switch in net.switches:
-        print "iniciando ", switch.name
+        #print "iniciando ", switch.name
         if switch.name[:3] == "PTT":
             switch.start([c2])
-            print ">>>>>instanciando switch com matador de passarinho"
+            #print ">>>>>instanciando switch com matador de passarinho"
         else:
-            print ">>>>instanciando switch sem matador de passarinho"
+            #print ">>>>instanciando switch sem matador de passarinho"
             switch.start([c1])
         #time.sleep(1)
     print "terminou de iniciar os switches"
@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
     print "monitoramento ativado em todos os hosts"
 
-    print "Dumping host connections"
+    #print "Dumping host connections"
     #dumpNodeConnections(net.hosts)
     #net.pingAll(timeout=0.1)
     print "tudo ok"

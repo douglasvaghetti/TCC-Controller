@@ -37,7 +37,6 @@ while True:
             shell=True)
         (out, err) = proc.communicate()
         NRegras += int(out)
-        #NRegras += os.system("ovs-ofctl dump-flows %s | wc -l"%ptt)
 
     f = open("acumulado.py", 'a')
     f.write('dados["malicioso"].append(' + str(icmp) + ')\n')

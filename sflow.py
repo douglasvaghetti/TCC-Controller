@@ -29,14 +29,14 @@ def configSFlow(net, collector, ifname):
         ifname, collector, sampling, polling)
     for s in net.switches:
         sflow += ' -- set bridge %s sflow=@sflow' % s
-    print ' '.join([s.name for s in net.switches])
+    #print ' '.join([s.name for s in net.switches])
     quietRun(sflow)
 
 
 def sendTopology(net, agent, collector):
     print "*** Sending topology"
     topo = {'nodes': {}, 'links': {}}
-    print net.switches
+    #print net.switches
     for s in net.switches:
         topo['nodes'][s.name] = {'agent': agent, 'ports': {}}
     path = '/sys/devices/virtual/net/'
