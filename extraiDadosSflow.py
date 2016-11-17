@@ -21,7 +21,7 @@ while True:
         "http://127.0.0.1:8008/app/dashboard-example/scripts/metrics.js/metric/json"
     )
     try:
-        icmp = r.json()['top-5-protocols']['eth.ip.icmp'] / 1024**2
+        icmp = r.json()['top-5-protocols']['eth.ip'] / 1024**2
     except:
         icmp = 0
     try:
