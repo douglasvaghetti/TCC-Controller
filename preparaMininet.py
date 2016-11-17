@@ -21,10 +21,10 @@ if __name__ == "__main__":
     n = 0
     controladoresPorSW = {}
     os.system(
-        "/home/mininet/pox/pox.py log.level --INFO openflow.of_01 --port=%d --address=10.0.0.5  forwarding.l2_learning  &"
+        "/home/mininet/pox/pox.py log.level --ERROR openflow.of_01 --port=%d --address=10.0.0.5  forwarding.l2_learning  &"
         % (6634))
     os.system(
-        "/home/mininet/pox/pox.py log.level --INFO openflow.of_01 --port=%d --address=10.0.0.5 misc.matador_de_passarinho --webServerPort=%d &"
+        "/home/mininet/pox/pox.py log.level --ERROR openflow.of_01 --port=%d --address=10.0.0.5 misc.matador_de_passarinho --webServerPort=%d &"
         % (6635, 6670))
     time.sleep(1)
     c1 = net.addController(
@@ -83,7 +83,7 @@ if __name__ == "__main__":
                 host.cmd("./simulaHostConsumidor.sh '%s' &" %
                          (" ".join(ipsHostsProvedores)))
             elif "A" in host.name:  # se eh host agressor, ex: ISPXAY
-                host.cmd("sleep 10s && sleep $[ ( $RANDOM %% 30 ) + 1 ]s && ping -i 0.0005 -s 1000 %s > /dev/null &" %
+                host.cmd("sleep 10s && sleep $[ ( $RANDOM %% 30 ) + 1 ]s && ./udp -h %s -ts 2ms > /dev/null &" %
                          (random.choice(ipsHostsVitimas)))
             elif len(host.name) == 4:
                 pass
