@@ -53,7 +53,8 @@ def sendTopology(net,agent,collector):
           topo['links'][linkName] = {'node1': s1.name, 'port1': intf[0].name, 'node2': s2.name, 'port2': intf[1].name}
       j += 1
     i += 1
-
+  
+  print "gerou ",dumps(topo)
   put('http://'+collector+':8008/topology/json',data=dumps(topo))
 
 def wrapper(fn,collector):

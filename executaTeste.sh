@@ -12,13 +12,13 @@ clear
 mkdir $diretorio
 mkdir "$diretorio/dados"
 cp host.py "$diretorio/dados"
-cp dadosGrafo.py $diretorio
+cp "dadosGrafo$1.py" $diretorio
 chmod 777 -R $diretorio
-
 cd "$diretorio/dados/"
-python ../../../extraiDadosSflow.py &
+python ../../../extraiDadosSflow.py $1 &
 cd "../../../"
-python preparaMininet.py $diretorio
+./preparaAnuncioAS.sh $1 $diretorio &
+python preparaMininet.py $diretorio $1
 echo "encerrou o prepara mininet"
 cd "$diretorio/dados/"
 mn -c

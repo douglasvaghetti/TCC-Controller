@@ -3,7 +3,6 @@ from mininet.util import dumpNodeConnections
 from mininet.node import Controller, RemoteController
 from roteamento import criaRotas
 from grafo import Grafo
-from dadosGrafo import grafo, defs
 import sys
 from mininet.link import TCLink
 import random
@@ -13,6 +12,8 @@ from mininet.cli import CLI
 import sflow
 
 if __name__ == "__main__":
+
+    execfile("dadosGrafo"+sys.argv[2]+".py")
     print "instanciando topologia"
     topologia = Grafo(grafo, defs)
     net = topologia.net
@@ -83,7 +84,7 @@ if __name__ == "__main__":
                 host.cmd("./simulaHostConsumidor.sh '%s' &" %
                          (" ".join(ipsHostsProvedores)))
             elif "A" in host.name:  # se eh host agressor, ex: ISPXAY
-                host.cmd("sleep 10s && sleep $[ ( $RANDOM %% 30 ) + 1 ]s && ./udp -h %s -ts 2ms > /dev/null &" %
+                host.cmd("sleep 5s && sleep $[ ( $RANDOM %% 25 ) + 1 ]s && ./udp -h %s -ts 2ms > /dev/null &" %
                          (random.choice(ipsHostsVitimas)))
             elif len(host.name) == 4:
                 pass
@@ -91,9 +92,8 @@ if __name__ == "__main__":
         elif host.name[:2] == "CP":
             if len(host.name) == 5:
                 host.cmd("./webfsd -p80")
-            elif len(host.name) == 3:
-                pass
-                #host.cmd("./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces)))
+                # if "V" in host.name:
+                    # host.cmd("./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces)))
         elif host.name[:2] == "TP":
             pass
             #host.cmd("./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces)))
@@ -101,11 +101,13 @@ if __name__ == "__main__":
     print "monitoramento ativado em todos os hosts"
 
     #print "Dumping host connections"
-    #dumpNodeConnections(net.hosts)
+    dumpNodeConnections(net.hosts)
     #net.pingAll(timeout=0.1)
     print "tudo ok"
     #net.pingAll(timeout=0.2)
-    CLI(net)
+    #CLI(net)
+    print "Rodando teste"
+    time.sleep(140)
     #net.pingAll(timeout=0.1)
     print "fim"
     net.stop()

@@ -15,6 +15,7 @@ class Grafo():
         self.RedesPublicasPorAS = {}
         self.SWsQueImplementamBloqueio = set()
         #cria os nodos no mininet
+        self.net.addSwitch("S9sw")
         for nodo in grafoAciclico:
             #print "processando nodo ",nodo
             if nodo[:3] == "ISP":
@@ -137,6 +138,7 @@ class Grafo():
         router = self.net.addHost(nome,cls=LinuxRouter,ip=ipRouter)
         switch = self.net.addSwitch(nome+"sw")
         self.net.addLink(switch,router)
+        #self.net.addLink(switch,"S9sw")
 
         for i in range(tamanho):
             ipHost = "10.0.%d.%d/24"%(prefixo,i+2) #pula o zero e o router
