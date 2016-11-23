@@ -18,11 +18,14 @@ cd "$diretorio/dados/"
 python ../../../extraiDadosSflow.py $1 &
 cd "../../../"
 ./preparaAnuncioAS.sh $1 $diretorio &
+idProcesso=$!
 python preparaMininet.py $diretorio $1
 echo "encerrou o prepara mininet"
 cd "$diretorio/dados/"
 mn -c
 pgrep python | xargs -L1 -I% kill -9 %
 echo "rodou o matador de python"
+kill -9 $idProcesso
+echo "matou preparaAnunciosAs.sh"
 python host.py 
 echo "plotou o grafico"
