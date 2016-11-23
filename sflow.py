@@ -43,10 +43,10 @@ def sendTopology(net, agent, collector):
     for child in listdir(path):
         parts = re.match('^([A-Z]*\d(sw)?)(-eth\d)?', child)
         #parts = re.match('(^s[0-9]+)-(.*)', child)
-        if parts != None:
-            print "deu match em",child
-        else:
-            print "nao deu match em",child
+        #if parts != None:
+        #    print "deu match em",child
+        #else:
+        #    print "nao deu match em",child
         if parts == None: continue
         ifindex = open(path + child + '/ifindex').read().split('\n', 1)[0]
         topo['nodes'][parts.group(1)]['ports'][child] = {'ifindex': ifindex}
@@ -74,7 +74,7 @@ def sendTopology(net, agent, collector):
                     }
             j += 1
         i += 1
-    print "gerou", dumps(topo)
+    #print "gerou", dumps(topo)
     put('http://' + collector + ':8008/topology/json', data=dumps(topo))
 
 
