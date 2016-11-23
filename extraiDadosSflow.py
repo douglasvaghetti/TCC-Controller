@@ -41,12 +41,14 @@ while True:
         (out, err) = proc.communicate()
         #print "erro:",err
         NRegras += int(out)
-    r = requests.get(
-        "http://127.0.0.1:8008/app/mininet-dashboard/scripts/metrics.js/metric/json"
-    )
+    r = requests.get("http://127.0.0.1:8008/app/mininet-dashboard/scripts/metrics.js/metric/json")
     try:
-        chegouNaVitima = r.json()["top-5-interfaces"][
-            "CP1sw_SEP_CP1sw-eth1"] / 1024**2
+        chegouNaVitima = 0 
+        todasInterfaces = r.json()["top-5-interfaces"]
+        #print "todasInterfaces = ",todasInterfaces
+        for chave in [i for i in todasInterfaces.keys() if i[:len("CP1sw_SEP_CP1sw-")] == "CP1sw_SEP_CP1sw-"]:
+            chegouNaVitima += todasInterfaces[chave]/1024**2
+        #print "calculou chegouNaVitima = ",chegouNaVitima
     except:
         chegouNaVitima = 0
     icmp = str(icmp)
