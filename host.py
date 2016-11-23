@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 import time
+import pylab
 
 plt.grid(True)
 
@@ -14,17 +15,19 @@ import os
 execfile("acumulado.py")
 eixoX = [i[1] for i in dados['malicioso']]
 primeiro = eixoX[0]
-eixoX = [i-primeiro for i in eixoX]
+eixoX = [i-primeiro for i in eixoX][:140]
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
-ax.plot(eixoX, [i[0] for i in dados['legitimo']], color="blue")
-ax.plot(eixoX, [i[0] for i in dados['malicioso']], color="red")
-ax.plot(eixoX, [i[0] for i in dados['chegou']],color="purple")
+ax.plot(eixoX, [i[0] for i in dados['legitimo'][:140]], color="blue",label=u"Tráfego legítimo")
+ax.plot(eixoX, [i[0] for i in dados['malicioso'][:140]], color="red",label=u"Tráfego malicioso")
+ax.plot(eixoX, [i[0] for i in dados['chegou'][:140]],color="purple",label=u"Tráfego no SA vítima")
 ax.set_xlabel("Tempo(s)")
 ax.set_ylabel(u"Tráfego (MB/s)")
 ax.set_ylim(0,1024)
+ax.set_xlim(0,140)
+pylab.legend()
 for bloq in dados['bloqueio']:
     y = int([i for i in dados['malicioso'] if i[1]==bloq[1]][0][0])
     x = int(bloq[1]) - primeiro
@@ -37,7 +40,7 @@ plt.clf()
 fig2 = plt.figure()
 ax2 = fig2.add_subplot(111)
 
-ax2.plot(eixoX, [i[0] for i in dados['regras']], color="green")
+ax2.plot(eixoX, [i[0] for i in dados['regras'][:140]], color="green")
 ax2.set_xlabel("Tempo(s)")
 ax2.set_ylabel(u"Regras instaladas")
 plt.savefig("regras.png")
