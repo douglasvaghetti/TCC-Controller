@@ -18,7 +18,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
         global controladores
         print (args[2].socket.getsockname()[1])
         self.controller = controladores[args[2].socket.getsockname()]
-        print "controladores = ",controladores,"self.controlador = ",self.controller
+        #print "controladores = ",controladores,"self.controlador = ",self.controller
         SocketServer.BaseRequestHandler.__init__(self,*args,**kwargs)
     
     def handle(self):
@@ -127,7 +127,7 @@ class Tutorial (object):
         msg.match = of.ofp_match(dl_type = pkt.ethernet.IP_TYPE, nw_dst=ipDest,nw_src=ipOrig)
         msg.idle_timeout = 10
         #sem acao nenhuma = DROP
-        print "criou regra de drop de ",ipOrig," para ",ipDest
+        log.info("criou regra de drop de ",ipOrig," para ",ipDest)
         self.connection.send(msg)
 
     def cria_regra_pode_seguir(self,ipOrig,ipDest,porta):
@@ -137,7 +137,7 @@ class Tutorial (object):
         msg.match = of.ofp_match(dl_type = pkt.ethernet.IP_TYPE, nw_dst=ipDest,nw_src=ipOrig)
         action = of.ofp_action_output(port = porta)
         msg.actions.append(action)
-        print "criou regra de pode seguir de ",ipOrig," para ",ipDest
+        log.info("criou regra de pode seguir de ",ipOrig," para ",ipDest)
         self.connection.send(msg)
 
     def cria_regra_vai_controller(self,ipDest):

@@ -15,10 +15,10 @@ grafo["CP1"] = ["TP1"]
 defs = {}
 defs["PTT1"] = (1,True)
 defs["PTT2"] = (2,True)
-defs["ISP1"] = (1,5, 0)
-defs["ISP2"] = (2,5, 3)
-defs["ISP3"] = (3,5, 3)
-defs["ISP4"] = (4,5, 3)
+defs["ISP1"] = (1,15, 0)
+defs["ISP2"] = (2,15, 8)
+defs["ISP3"] = (3,15, 8)
+defs["ISP4"] = (4,15, 8)
 defs["TP1"] = (201,)
-defs["CP1"] = (101,5,2)
+defs["CP1"] = (101,15,4)
 

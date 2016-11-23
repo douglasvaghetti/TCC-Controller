@@ -81,10 +81,11 @@ if __name__ == "__main__":
         #print "./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces))
         if host.name[:3] == "ISP":
             if "H" in host.name:  #se eh host normal, ex: ISPXHY
+                random.shuffle(ipsHostsProvedores)
                 host.cmd("./simulaHostConsumidor.sh '%s' &" %
                          (" ".join(ipsHostsProvedores)))
             elif "A" in host.name:  # se eh host agressor, ex: ISPXAY
-                host.cmd("sleep 5s && sleep $[ ( $RANDOM %% 25 ) + 1 ]s && ./udp -h %s -ts 2ms > /dev/null &" %
+                host.cmd("sleep 10s && sleep $[ ( $RANDOM %% 15 ) + 1 ]s && ./udp -h %s -ts 2ms > /dev/null &" %
                          (random.choice(ipsHostsVitimas)))
             elif len(host.name) == 4:
                 pass
@@ -107,7 +108,7 @@ if __name__ == "__main__":
     #net.pingAll(timeout=0.2)
     #CLI(net)
     print "Rodando teste"
-    time.sleep(140)
+    time.sleep(150)
     #net.pingAll(timeout=0.1)
     print "fim"
     net.stop()
