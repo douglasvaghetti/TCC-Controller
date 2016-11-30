@@ -1,7 +1,6 @@
 from mininet.net import Mininet
 from mininet.util import dumpNodeConnections
 from mininet.node import Controller, RemoteController
-from roteamento import criaRotas
 from grafo import Grafo
 import sys
 from mininet.link import TCLink
@@ -40,7 +39,7 @@ if __name__ == "__main__":
     c2.start()
     #time.sleep(5)
 
-    print "inciando os switches"
+    print "iniciando os switches"
     for switch in net.switches:
         #print "iniciando ", switch.name
         if switch.name[:3] == "PTT":
@@ -51,10 +50,6 @@ if __name__ == "__main__":
             switch.start([c1])
         #time.sleep(1)
     print "terminou de iniciar os switches"
-
-    print "criando rotas"
-    criaRotas(net, grafo, topologia, defs)
-    print "terminou de criar rotas"
 
     print "inicializando sflow"
     collector = '127.0.0.1'
@@ -75,10 +70,8 @@ if __name__ == "__main__":
         i.intfs[0].ip for i in net.hosts
         if i.name[:2] == "CP" and "V" in i.name
     ]
-    #print "ips dos hosts provedores = ",ipsHostsProvedores
-    for host in net.hosts:  #routers tambem sao hosts
+    for host in net.hosts:  
         interfaces = [i.name for i in host.intfs.values()]
-        #print "./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces))
         if host.name[:3] == "ISP":
             if "H" in host.name:  #se eh host normal, ex: ISPXHY
                 random.shuffle(ipsHostsProvedores)
@@ -89,20 +82,16 @@ if __name__ == "__main__":
                          (random.choice(ipsHostsVitimas)))
             elif len(host.name) == 4:
                 pass
-                #host.cmd("./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces)))
         elif host.name[:2] == "CP":
             if len(host.name) == 5:
                 host.cmd("./webfsd -p80")
-                # if "V" in host.name:
-                    # host.cmd("./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces)))
         elif host.name[:2] == "TP":
             pass
-            #host.cmd("./monitoraDentroDoHost.sh %s %s '%s' &"%(diretorio,host.name," ".join(interfaces)))
 
     print "monitoramento ativado em todos os hosts"
 
     #print "Dumping host connections"
-    dumpNodeConnections(net.hosts)
+    #dumpConnections(net.hosts)
     #net.pingAll(timeout=0.1)
     print "tudo ok"
     #net.pingAll(timeout=0.2)

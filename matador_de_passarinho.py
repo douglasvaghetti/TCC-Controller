@@ -125,7 +125,7 @@ class Tutorial (object):
         
         #msg.match = of.ofp_match.from_packet(packet)
         msg.match = of.ofp_match(dl_type = pkt.ethernet.IP_TYPE, nw_dst=ipDest,nw_src=ipOrig)
-        msg.idle_timeout = 10
+        msg.idle_timeout = 25
         #sem acao nenhuma = DROP
         log.info("criou regra de drop de ",ipOrig," para ",ipDest)
         self.connection.send(msg)
@@ -133,7 +133,7 @@ class Tutorial (object):
     def cria_regra_pode_seguir(self,ipOrig,ipDest,porta):
         msg = of.ofp_flow_mod()
         msg.priority = 200
-        msg.idle_timeout = 10
+        msg.idle_timeout = 25
         msg.match = of.ofp_match(dl_type = pkt.ethernet.IP_TYPE, nw_dst=ipDest,nw_src=ipOrig)
         action = of.ofp_action_output(port = porta)
         msg.actions.append(action)

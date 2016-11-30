@@ -11,7 +11,7 @@ diretorio="testes/$data"
 clear
 mkdir $diretorio
 mkdir "$diretorio/dados"
-cp host.py "$diretorio/dados"
+cp plot.py "$diretorio/dados"
 cp "dadosGrafo$1.py" $diretorio
 chmod 777 -R $diretorio
 cd "$diretorio/dados/"
@@ -27,5 +27,5 @@ pgrep python | xargs -L1 -I% kill -9 %
 echo "rodou o matador de python"
 kill -9 $idProcesso
 echo "matou preparaAnunciosAs.sh"
-python host.py 
+python plot.py 
 echo "plotou o grafico"

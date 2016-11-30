@@ -74,7 +74,7 @@ def sendTopology(net, agent, collector):
                     }
             j += 1
         i += 1
-    #print "gerou", dumps(topo)
+    print "gerou", dumps(topo)
     put('http://' + collector + ':8008/topology/json', data=dumps(topo))
 
 
