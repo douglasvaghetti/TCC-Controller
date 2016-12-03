@@ -58,7 +58,7 @@ for count, ptt in enumerate(ptts):
     for bloq in dados['bloqueio']:
 #       print "bloq ", bloq[0][3:], "ptt ", ptt[3:]
         if bloq[0][3:] == ptt[3:] :
-            y = int([i[0] for i in dados['regras'] if i[2] == bloq[1] and i[1] == ptt][0])
+            y = int([i[0] for i in dados['regras'] if i[2] == bloq[1] and i[1][3:] == ptt[3:]][0])
 #           print " y = ",y
             x = int(bloq[1]) - primeiro
             ax2.annotate(bloq[0],xy=(x,y),xytext=(x-15,y+10),arrowprops=dict(facecolor='black', shrink=0.05,frac=0.3,width=1,headwidth=10))
