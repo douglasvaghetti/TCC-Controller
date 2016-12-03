@@ -9,11 +9,13 @@ var points, other='-other-', SEP='_SEP_', trend = new Trend(300,1);
 
 // define flows, prepend application name to avoid name clashes with other apps
 setFlow('mn_bytes',{value:'bytes',t:2,fs:SEP});
-setFlow('mn_flow',{keys:'ipsource,ipdestination,ipprotocol,or:tcpsourceport:udpsourceport:icmptype,or:tcpdestinationport:udpdestinationport:icmpcode',value:'bytes',t:2,fs:SEP});
+//setFlow('mn_flow',{keys:'stack,ipsource,ipdestination,ipprotocol,or:tcpsourceport:udpsourceport:icmptype,or:tcpdestinationport:udpdestinationport:icmpcode',value:'bytes',t:2,fs:SEP});
+//setFlow('mn_flow',{keys:'node:outputifindex,or:url:stack',value:'bytes',t:2,fs:SEP});
+setFlow('mn_flow',{keys:'ifname:inputifindex,stack',value:'bytes',t:2,fs:SEP});
 
 function calculateTopN(metric,n,minVal,total_bps) {     
   var total, top, topN, i, bps;
-  top = activeFlows('TOPOLOGY',metric,n,minVal,'edge');
+  top = activeFlows('TOPOLOGY',metric,10000,100);
   var topN = {};
   if(top) {
     total = 0;
@@ -42,6 +44,22 @@ function calculateTopInterfaces(metric,n) {
   return topN; 
 }
 
+/*
+function calculateTopInterfaces(metric,n) {
+  var top = table('TOPOLOGY','sort:'+metric+':-'+n);
+  var topN = {};
+  if(top) {
+    for(var i = 0; i < top.length; i++) {
+      var val = top[i][0];
+      var port = topologyInterfaceToPort(val.agent,val.dataSource);
+      if(port && port.node && port.port) {
+        topN[port.node + SEP + port.port] = val.metricValue * 8; 
+      }
+    }
+  }
+  return topN; 
+}
+*/
 function flowCount(flow) {
   var res = activeFlows('TOPOLOGY',flow,1,0,'edge');
   return res && res.length > 0 ? res[0].value : 0;
@@ -54,7 +72,7 @@ setIntervalHandler(function() {
   points['diameter'] = topologyDiameter();
 
   var bps = flowCount('mn_bytes') * 8;  
-  points['top-5-flows'] = calculateTopN('mn_flow',5,1,points.bps);
+  points['top-5-flows'] = calculateTopN('mn_flow',1000,1,points.bps);
   points['top-5-interfaces'] = calculateTopInterfaces('mn_bytes',100); 
 
   trend.addPoints(points);
