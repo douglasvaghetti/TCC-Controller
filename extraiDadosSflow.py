@@ -21,6 +21,8 @@ f.close()
 sleep(5)
 
 while True:
+    timestamp = int(time.time())
+
     r = requests.get(
         "http://127.0.0.1:8008/app/dashboard-example/scripts/metrics.js/metric/json"
     )
@@ -63,7 +65,6 @@ while True:
     #NRegras = str(NRegras)
     maliciosoNaVitima = str(maliciosoNaVitima)
     legitimoNaVitima = str(legitimoNaVitima)
-    timestamp = int(time.time())
 
     f = open("acumulado.py", 'a')
     f.write('dados["malicioso"].append((%s,%d))\n'%(icmp,timestamp))
